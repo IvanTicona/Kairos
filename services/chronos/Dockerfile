@@ -4,14 +4,12 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 FROM base AS deps
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm config set onlyBuiltDependencies '["better-sqlite3","esbuild"]' \
- && pnpm install --no-frozen-lockfile --prod
+COPY package.json .npmrc pnpm-lock.yaml* ./
+RUN pnpm install --no-frozen-lockfile --prod
 
 FROM base AS build
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm config set onlyBuiltDependencies '["better-sqlite3","esbuild"]' \
- && pnpm install --no-frozen-lockfile
+COPY package.json .npmrc pnpm-lock.yaml* ./
+RUN pnpm install --no-frozen-lockfile
 COPY tsconfig.json ./
 COPY src ./src
 RUN pnpm build
