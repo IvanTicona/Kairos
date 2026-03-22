@@ -8,3 +8,7 @@ Thumbs.db
 coverage/
 *.sqlite
 *.db
+*.db-shm
+*.db-wal
+data/
+package.json.tmp

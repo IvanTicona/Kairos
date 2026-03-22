@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporte Semanal — {{client_name}}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #333; }
+    h1 { margin-bottom: 4px; }
+    .date-range { color: #666; margin-bottom: 30px; }
+    .project { margin-bottom: 24px; }
+    .project h2 { font-size: 1.1em; border-bottom: 2px solid #eee; padding-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 6px 8px; }
+    th { font-size: 0.85em; color: #888; text-transform: uppercase; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .subtotal { font-weight: bold; border-top: 1px solid #ddd; }
+    .grand-total { font-size: 1.2em; font-weight: bold; margin-top: 30px; padding-top: 10px; border-top: 2px solid #333; }
+  </style>
+</head>
+<body>
+  <h1>Reporte Semanal — {{client_name}}</h1>
+  <p class="date-range">{{week_start}} al {{week_end}}</p>
+
+  {{#each projects}}
+  <div class="project">
+    <h2>{{this.project_name}}</h2>
+    <table>
+      <thead>
+        <tr><th>Descripción</th><th>Fecha</th><th>Duración</th></tr>
+      </thead>
+      <tbody>
+        {{#each this.entries}}
+        <tr>
+          <td>{{#if this.description}}{{this.description}}{{else}}(sin descripción){{/if}}</td>
+          <td>{{this.date}}</td>
+          <td>{{this.duration}}</td>
+        </tr>
+        {{/each}}
+        <tr class="subtotal">
+          <td colspan="2">Subtotal</td>
+          <td>{{this.total_display}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {{/each}}
+
+  {{#unless projects.length}}
+  <p>No hay entradas de tiempo para esta semana.</p>
+  {{/unless}}
+
+  <p class="grand-total">TOTAL SEMANA: {{grand_total_display}}</p>
+</body>
+</html>

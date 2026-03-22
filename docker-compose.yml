@@ -1,0 +1,57 @@
+services:
+  forge:
+    build:
+      context: ./services/forge
+      dockerfile: Dockerfile
+    container_name: kairos-forge
+    restart: unless-stopped
+    ports:
+      - "${FORGE_PORT:-3001}:3001"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FORGE_API_KEY=${FORGE_API_KEY}
+      - FORGE_PORT=3001
+      - FORGE_TIER_MAP=${FORGE_TIER_MAP:-}
+    volumes:
+      - forge-data:/app/data
+    networks:
+      - kairos
+
+  chronos:
+    build:
+      context: ./services/chronos
+      dockerfile: Dockerfile
+    container_name: kairos-chronos
+    restart: unless-stopped
+    ports:
+      - "${CHRONOS_PORT:-3002}:3002"
+    environment:
+      - CHRONOS_PORT=3002
+      - CHRONOS_DB_PATH=data/chronos.db
+    volumes:
+      - chronos-data:/app/data
+    networks:
+      - kairos
+
+  bot:
+    build:
+      context: ./services/bot
+      dockerfile: Dockerfile
+    container_name: kairos-bot
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_OWNER_ID=${TELEGRAM_OWNER_ID}
+      - CHRONOS_URL=http://kairos-chronos:3002
+    depends_on:
+      - chronos
+    networks:
+      - kairos
+
+networks:
+  kairos:
+    driver: bridge
+
+volumes:
+  forge-data:
+  chronos-data:
