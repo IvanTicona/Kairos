@@ -1,0 +1,19 @@
+{
+  "name": "kairos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kairos — Personal productivity ecosystem (el momento oportuno)",
+  "scripts": {
+    "dev": "docker compose up --build",
+    "dev:forge": "pnpm --filter @kairos/forge dev",
+    "dev:chronos": "pnpm --filter @kairos/chronos dev",
+    "dev:cortex": "pnpm --filter @kairos/cortex dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "deploy": "docker compose -f docker-compose.yml up -d --build"
+  },
+  "engines": {
+    "node": ">=20.19.0",
+    "pnpm": ">=9.0.0"
+  }
+}
