@@ -18,6 +18,7 @@ FROM node:20-slim AS runtime
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY src/db/schema.sql ./dist/db/schema.sql
 COPY src/templates ./dist/templates
 COPY package.json ./
 
