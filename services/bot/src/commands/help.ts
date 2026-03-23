@@ -1,19 +1,19 @@
 import type { Bot } from "grammy";
 
-const HELP_TEXT = `🕐 *KairosBot — Tu asistente de productividad*
+const HELP_TEXT = `🕐 <b>KairosBot — Tu asistente de productividad</b>
 
-*Timer:*
+<b>Timer:</b>
 /timer — Iniciar un timer (elegí proyecto)
 /stop — Detener el timer activo
 /status — Ver timer actual
 
-*Clientes y Proyectos:*
+<b>Clientes y Proyectos:</b>
 /clientes — Listar clientes
-/nuevo\\_cliente — Crear un cliente
+/nuevo_cliente — Crear un cliente
 /proyectos — Ver proyectos por cliente
-/nuevo\\_proyecto — Crear un proyecto
+/nuevo_proyecto — Crear un proyecto
 
-*Reportes:*
+<b>Reportes:</b>
 /reporte — Reporte semanal (PDF)
 /entradas — Entradas de esta semana
 
@@ -22,11 +22,11 @@ const HELP_TEXT = `🕐 *KairosBot — Tu asistente de productividad*
 export function registerHelpCommands(bot: Bot) {
   bot.command("start", async (ctx) => {
     await ctx.reply(`¡Hola! Soy KairosBot 👋\n\n${HELP_TEXT}`, {
-      parse_mode: "MarkdownV2",
+      parse_mode: "HTML",
     });
   });
 
   bot.command("help", async (ctx) => {
-    await ctx.reply(HELP_TEXT, { parse_mode: "MarkdownV2" });
+    await ctx.reply(HELP_TEXT, { parse_mode: "HTML" });
   });
 }
