@@ -12,3 +12,4 @@ coverage/
 *.db-wal
 data/
 package.json.tmp
+.claude/
