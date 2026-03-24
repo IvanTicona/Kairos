@@ -8,7 +8,7 @@ const log = pino({ name: "kairos-bot:internal" });
 const notifySchema = z.object({
   chat_id: z.number().int(),
   text: z.string().min(1),
-  parse_mode: z.enum(["HTML", "MarkdownV2"]).optional(),
+  parse_mode: z.enum(["HTML", "MarkdownV2", ""]).optional(),
 });
 
 export function createInternalRoutes(bot: Bot) {
@@ -26,7 +26,7 @@ export function createInternalRoutes(bot: Bot) {
 
     try {
       const result = await bot.api.sendMessage(chat_id, text, {
-        parse_mode,
+        ...(parse_mode ? { parse_mode } : {}),
       });
 
       return c.json({ ok: true, message_id: result.message_id });

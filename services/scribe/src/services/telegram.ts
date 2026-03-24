@@ -52,8 +52,9 @@ async function sendNotification(chatId: number, text: string, parseMode = "HTML"
 }
 
 export async function notifyPrompt(generatedPrompt: string): Promise<void> {
-  const text = `<b>Scribe - Prompt Generado</b>\n\n<pre>${escapeHtml(generatedPrompt)}</pre>`;
-  await sendNotification(config.TELEGRAM_OWNER_ID, text);
+  // Send header as HTML, then prompt as plain text (no parse_mode) to avoid HTML conflicts
+  await sendNotification(config.TELEGRAM_OWNER_ID, "📋 <b>Scribe — Prompt Generado</b>");
+  await sendNotification(config.TELEGRAM_OWNER_ID, generatedPrompt, "");
   log.info("Prompt notification sent to Telegram");
 }
 
