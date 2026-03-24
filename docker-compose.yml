@@ -63,7 +63,7 @@ services:
       - SCRIBE_PORT=3004
       - SCRIBE_DB_PATH=data/scribe.db
       - SLACK_APP_TOKEN=${SLACK_APP_TOKEN}
-      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      - SLACK_USER_TOKEN=${SLACK_USER_TOKEN}
       - SLACK_CHANNEL_ID=${SLACK_CHANNEL_ID:-D0A55T5E4J0}
       - FORGE_URL=http://kairos-forge:3001
       - FORGE_API_KEY=${FORGE_API_KEY}

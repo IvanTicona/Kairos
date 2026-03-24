@@ -19,16 +19,10 @@ interface SlackMessageEvent {
 export async function startSlackListener(): Promise<void> {
   const client = new SocketModeClient({ appToken: config.SLACK_APP_TOKEN });
 
-  // Debug: log all incoming events
-  client.on("slack_event", async ({ type, body }) => {
-    log.info({ type, eventType: body?.event?.type }, "Incoming Slack event");
-  });
-
   client.on("message", async ({ event, ack }) => {
     await ack();
 
     const msg = event as SlackMessageEvent;
-    log.info({ msg }, "Message event received");
 
     // Ignore bot messages
     if (msg.bot_id) return;
