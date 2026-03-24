@@ -39,12 +39,41 @@ services:
       dockerfile: Dockerfile
     container_name: kairos-bot
     restart: unless-stopped
+    expose:
+      - "3005"
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_OWNER_ID=${TELEGRAM_OWNER_ID}
       - CHRONOS_URL=http://kairos-chronos:3002
+      - BOT_INTERNAL_PORT=3005
     depends_on:
       - chronos
+    networks:
+      - kairos
+
+  scribe:
+    build:
+      context: ./services/scribe
+      dockerfile: Dockerfile
+    container_name: kairos-scribe
+    restart: unless-stopped
+    ports:
+      - "${SCRIBE_PORT:-3004}:3004"
+    environment:
+      - SCRIBE_PORT=3004
+      - SCRIBE_DB_PATH=data/scribe.db
+      - SLACK_APP_TOKEN=${SLACK_APP_TOKEN}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      - SLACK_CHANNEL_ID=${SLACK_CHANNEL_ID:-D0A55T5E4J0}
+      - FORGE_URL=http://kairos-forge:3001
+      - FORGE_API_KEY=${FORGE_API_KEY}
+      - BOT_URL=http://kairos-bot:3005
+      - TELEGRAM_OWNER_ID=${TELEGRAM_OWNER_ID}
+    volumes:
+      - scribe-data:/app/data
+    depends_on:
+      - forge
+      - bot
     networks:
       - kairos
 
@@ -55,3 +84,4 @@ networks:
 volumes:
   forge-data:
   chronos-data:
+  scribe-data:

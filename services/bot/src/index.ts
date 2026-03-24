@@ -1,3 +1,6 @@
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import { logger as honoLogger } from "hono/logger";
 import { Bot } from "grammy";
 import pino from "pino";
 import { config } from "./config.js";
@@ -8,6 +11,8 @@ import { registerClientCommands } from "./commands/clients.js";
 import { registerProjectCommands } from "./commands/projects.js";
 import { registerReportCommands } from "./commands/reports.js";
 import { registerCallbacks } from "./callbacks/handler.js";
+import { health } from "./routes/health.js";
+import { createInternalRoutes } from "./routes/internal.js";
 
 const log = pino({ name: "kairos-bot" });
 
@@ -45,8 +50,26 @@ bot.catch((err) => {
   log.error({ err: err.error }, "Bot error");
 });
 
-// Start polling
+// --- Internal HTTP server (Hono) ---
+const app = new Hono();
+
+app.use("*", honoLogger());
+
+app.route("/", health);
+app.route("/", createInternalRoutes(bot));
+
+app.onError((err, c) => {
+  log.error({ err }, "Unhandled HTTP error");
+  return c.json({ error: "Internal server error" }, 500);
+});
+
+// Start both concurrently: bot polling + HTTP server
 log.info("KairosBot starting...");
+
 bot.start({
   onStart: () => log.info("KairosBot polling started"),
+});
+
+serve({ fetch: app.fetch, port: config.BOT_INTERNAL_PORT }, (info) => {
+  log.info(`KairosBot internal HTTP server listening on http://localhost:${info.port}`);
 });

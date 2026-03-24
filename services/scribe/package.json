@@ -1,8 +1,8 @@
 {
-  "name": "@kairos/bot",
+  "name": "@kairos/scribe",
   "version": "0.1.0",
   "private": true,
-  "description": "KairosBot — Centralized Telegram Bot",
+  "description": "Scribe — US Parser & Prompt Generator",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -11,14 +11,20 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",
-    "grammy": "^1.41.1",
+    "@slack/socket-mode": "^2.0.3",
+    "@slack/web-api": "^7.9.1",
+    "better-sqlite3": "^12.8.0",
     "hono": "^4.12.8",
     "pino": "^10.3.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.5.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3", "esbuild"]
   }
 }
