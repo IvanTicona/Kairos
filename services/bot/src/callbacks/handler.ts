@@ -15,15 +15,29 @@ const MONTH_NAMES_ES = [
 ];
 
 function getRecentMonths(count: number): Array<{ key: string; label: string }> {
-  const months = [];
   const now = new Date();
+  const day = now.getDate();
+  let year = now.getFullYear();
+  let month = now.getMonth() + 1;
+
+  // If before the 9th, current period started last month
+  if (day < 9) {
+    const prev = new Date(year, month - 2, 1);
+    year = prev.getFullYear();
+    month = prev.getMonth() + 1;
+  }
+
+  const months = [];
   for (let i = 0; i < count; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const year = d.getFullYear();
-    const month = d.getMonth() + 1;
+    const d = new Date(year, month - 1 - i, 1);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const endDate = new Date(y, m, 8); // next month's 8th
+    const endM = endDate.getMonth() + 1;
+    const endY = endDate.getFullYear();
     months.push({
-      key: `${year}-${String(month).padStart(2, "0")}`,
-      label: `${MONTH_NAMES_ES[month - 1]} ${year}`,
+      key: `${y}-${String(m).padStart(2, "0")}`,
+      label: `9 ${MONTH_NAMES_ES[m - 1]} — 8 ${MONTH_NAMES_ES[endM - 1]} ${endY}`,
     });
   }
   return months;

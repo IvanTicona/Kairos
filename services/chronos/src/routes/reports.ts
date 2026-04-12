@@ -13,8 +13,11 @@ const MONTH_NAMES_ES = [
 ];
 
 function getMonthLabel(month: string): string {
-  const [year, monthNum] = month.split("-");
-  return `${MONTH_NAMES_ES[Number(monthNum) - 1]} ${year}`;
+  const [year, monthNum] = month.split("-").map(Number);
+  const endDate = new Date(year, monthNum, 8); // next month's 8th (JS months are 0-indexed)
+  const endMonth = endDate.getMonth() + 1;
+  const endYear = endDate.getFullYear();
+  return `9 ${MONTH_NAMES_ES[monthNum - 1]} — 8 ${MONTH_NAMES_ES[endMonth - 1]} ${endYear}`;
 }
 
 function getMonthRange(monthParam?: string): { monthStart: string; monthEnd: string; month: string } {
@@ -27,11 +30,19 @@ function getMonthRange(monthParam?: string): { monthStart: string; monthEnd: str
     const now = new Date();
     year = now.getFullYear();
     month = now.getMonth() + 1;
+    // If before the 9th, we're still in the previous period
+    if (now.getDate() < 9) {
+      const prev = new Date(year, month - 2, 1);
+      year = prev.getFullYear();
+      month = prev.getMonth() + 1;
+    }
   }
 
-  const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
-  const lastDay = new Date(year, month, 0).getDate();
-  const monthEnd = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+  const monthStart = `${year}-${String(month).padStart(2, "0")}-09`;
+  const endDate = new Date(year, month, 8); // next month's 8th
+  const endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth() + 1;
+  const monthEnd = `${endYear}-${String(endMonth).padStart(2, "0")}-08`;
   const monthKey = `${year}-${String(month).padStart(2, "0")}`;
 
   return { monthStart, monthEnd, month: monthKey };
