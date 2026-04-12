@@ -29,15 +29,12 @@ export function registerReportCommands(bot: Bot) {
   bot.command("entradas", async (ctx) => {
     try {
       const now = new Date();
-      const dayOfWeek = now.getDay();
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
-      const from = monday.toISOString().slice(0, 10);
+      const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 
       const { data: entries, display } = await chronos.getEntries({ from });
 
       if (!entries || entries.length === 0) {
-        await ctx.reply("No hay entradas esta semana.");
+        await ctx.reply("No hay entradas este mes.");
         return;
       }
 
@@ -51,7 +48,7 @@ export function registerReportCommands(bot: Bot) {
         return `• ${e.client_name}/${e.project_name}${desc} (${date}, ${duration})`;
       });
 
-      await ctx.reply(`*Entradas esta semana:*\n\n${lines.join("\n")}\n\n${display}`, {
+      await ctx.reply(`*Entradas este mes:*\n\n${lines.join("\n")}\n\n${display}`, {
         parse_mode: "Markdown",
       });
     } catch {
