@@ -40,8 +40,8 @@ await bot.api.setMyCommands([
   { command: "nuevo_cliente", description: "Crear un cliente" },
   { command: "proyectos", description: "Ver proyectos por cliente" },
   { command: "nuevo_proyecto", description: "Crear un proyecto" },
-  { command: "reporte", description: "Reporte semanal (PDF)" },
-  { command: "entradas", description: "Entradas de esta semana" },
+  { command: "reporte", description: "Reporte mensual (PDF)" },
+  { command: "entradas", description: "Entradas de este mes" },
   { command: "help", description: "Ver ayuda" },
 ]);
 
