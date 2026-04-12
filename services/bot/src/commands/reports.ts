@@ -16,7 +16,7 @@ export function registerReportCommands(bot: Bot) {
         keyboard.text(client.name, `report:${client.id}`);
         keyboard.row();
       }
-      await ctx.reply("¿De qué cliente querés el reporte semanal?", {
+      await ctx.reply("¿De qué cliente querés el reporte mensual?", {
         reply_markup: keyboard,
       });
     } catch {

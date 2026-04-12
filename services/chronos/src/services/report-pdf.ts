@@ -1,9 +1,9 @@
 import PDFDocument from "pdfkit";
 import { formatDuration } from "./timer.js";
-import type { WeeklyReportData } from "../types.js";
+import type { MonthlyReportData } from "../types.js";
 
 export function generatePdfReport(
-  data: WeeklyReportData,
+  data: MonthlyReportData,
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50 });
@@ -15,9 +15,9 @@ export function generatePdfReport(
 
     // Header
     doc.fontSize(20).font("Helvetica-Bold");
-    doc.text(`Reporte Semanal — ${data.client_name}`);
+    doc.text(`Reporte Mensual — ${data.client_name}`);
     doc.fontSize(12).font("Helvetica").fillColor("#666666");
-    doc.text(`${data.week_start} al ${data.week_end}`);
+    doc.text(data.month_label);
     doc.moveDown(1.5);
 
     // Projects
@@ -84,7 +84,7 @@ export function generatePdfReport(
     doc.moveDown(0.5);
     doc.fontSize(14).font("Helvetica-Bold").fillColor("#000000");
     doc.text(
-      `TOTAL SEMANA: ${formatDuration(data.grand_total_seconds)}`,
+      `TOTAL MES: ${formatDuration(data.grand_total_seconds)}`,
       50,
     );
 

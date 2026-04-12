@@ -29,10 +29,10 @@ export interface TimeEntryRow {
   client_name: string;
 }
 
-export interface WeeklyReportData {
+export interface MonthlyReportData {
   client_name: string;
-  week_start: string;
-  week_end: string;
+  month: string;
+  month_label: string;
   projects: Array<{
     project_name: string;
     entries: Array<{

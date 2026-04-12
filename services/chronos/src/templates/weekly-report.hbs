@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Reporte Semanal — {{client_name}}</title>
+  <title>Reporte Mensual — {{client_name}}</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #333; }
     h1 { margin-bottom: 4px; }
@@ -18,8 +18,8 @@
   </style>
 </head>
 <body>
-  <h1>Reporte Semanal — {{client_name}}</h1>
-  <p class="date-range">{{week_start}} al {{week_end}}</p>
+  <h1>Reporte Mensual — {{client_name}}</h1>
+  <p class="date-range">{{month_label}}</p>
 
   {{#each projects}}
   <div class="project">
@@ -46,9 +46,9 @@
   {{/each}}
 
   {{#unless projects.length}}
-  <p>No hay entradas de tiempo para esta semana.</p>
+  <p>No hay entradas de tiempo para este mes.</p>
   {{/unless}}
 
-  <p class="grand-total">TOTAL SEMANA: {{grand_total_display}}</p>
+  <p class="grand-total">TOTAL MES: {{grand_total_display}}</p>
 </body>
 </html>

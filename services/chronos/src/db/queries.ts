@@ -220,10 +220,10 @@ export interface ReportProject {
   total_seconds: number;
 }
 
-export function getWeeklyReportData(
+export function getMonthlyReportData(
   clientId: number,
-  weekStart: string,
-  weekEnd: string,
+  monthStart: string,
+  monthEnd: string,
 ): ReportProject[] {
   const rows = db
     .prepare(
@@ -237,7 +237,7 @@ export function getWeeklyReportData(
          AND te.started_at <= ? || ' 23:59:59'
        ORDER BY p.name, te.started_at`,
     )
-    .all(clientId, weekStart, weekEnd) as ReportEntry[];
+    .all(clientId, monthStart, monthEnd) as ReportEntry[];
 
   const grouped = new Map<string, ReportEntry[]>();
   for (const row of rows) {

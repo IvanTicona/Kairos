@@ -1,13 +1,43 @@
 import { Hono } from "hono";
-import { getWeeklyReportData, getClientById } from "../db/queries.js";
+import { getMonthlyReportData, getClientById } from "../db/queries.js";
 import { generatePdfReport } from "../services/report-pdf.js";
 import { generateHtmlReport } from "../services/report-html.js";
 import { formatDuration } from "../services/timer.js";
-import type { WeeklyReportData } from "../types.js";
+import type { MonthlyReportData } from "../types.js";
 
 const reports = new Hono();
 
-reports.get("/v1/reports/weekly", async (c) => {
+const MONTH_NAMES_ES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+function getMonthLabel(month: string): string {
+  const [year, monthNum] = month.split("-");
+  return `${MONTH_NAMES_ES[Number(monthNum) - 1]} ${year}`;
+}
+
+function getMonthRange(monthParam?: string): { monthStart: string; monthEnd: string; month: string } {
+  let year: number;
+  let month: number;
+
+  if (monthParam && /^\d{4}-\d{2}$/.test(monthParam)) {
+    [year, month] = monthParam.split("-").map(Number);
+  } else {
+    const now = new Date();
+    year = now.getFullYear();
+    month = now.getMonth() + 1;
+  }
+
+  const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const monthEnd = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+  const monthKey = `${year}-${String(month).padStart(2, "0")}`;
+
+  return { monthStart, monthEnd, month: monthKey };
+}
+
+reports.get("/v1/reports/monthly", async (c) => {
   const clientIdParam = c.req.query("client_id");
   if (!clientIdParam) {
     return c.json(
@@ -28,17 +58,15 @@ reports.get("/v1/reports/weekly", async (c) => {
     );
   }
 
-  const weekParam = c.req.query("week");
-  const { weekStart, weekEnd } = getWeekRange(weekParam);
-
+  const { monthStart, monthEnd, month } = getMonthRange(c.req.query("month"));
   const format = c.req.query("format") ?? "json";
-  const projectData = getWeeklyReportData(clientId, weekStart, weekEnd);
+  const projectData = getMonthlyReportData(clientId, monthStart, monthEnd);
   const grandTotal = projectData.reduce((sum, p) => sum + p.total_seconds, 0);
 
-  const reportData: WeeklyReportData = {
+  const reportData: MonthlyReportData = {
     client_name: client.name,
-    week_start: weekStart,
-    week_end: weekEnd,
+    month,
+    month_label: getMonthLabel(month),
     projects: projectData,
     grand_total_seconds: grandTotal,
   };
@@ -48,7 +76,7 @@ reports.get("/v1/reports/weekly", async (c) => {
     return new Response(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="reporte-${client.name}-${weekStart}.pdf"`,
+        "Content-Disposition": `attachment; filename="reporte-${client.name}-${month}.pdf"`,
       },
     });
   }
@@ -62,32 +90,8 @@ reports.get("/v1/reports/weekly", async (c) => {
 
   return c.json({
     data: reportData,
-    display: `Reporte semanal ${client.name}: ${weekStart} al ${weekEnd} — Total: ${formatDuration(grandTotal)}`,
+    display: `Reporte ${reportData.month_label} — ${client.name}: Total ${formatDuration(grandTotal)}`,
   });
 });
-
-function getWeekRange(weekParam?: string): {
-  weekStart: string;
-  weekEnd: string;
-} {
-  let monday: Date;
-
-  if (weekParam) {
-    monday = new Date(weekParam);
-  } else {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    monday = new Date(now);
-    monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
-  }
-
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-
-  return {
-    weekStart: monday.toISOString().slice(0, 10),
-    weekEnd: sunday.toISOString().slice(0, 10),
-  };
-}
 
 export { reports };

@@ -1,4 +1,4 @@
-import { InputFile } from "grammy";
+import { InlineKeyboard, InputFile } from "grammy";
 import type { Bot } from "grammy";
 import * as chronos from "../services/chronos.js";
 import { pendingProjects } from "../commands/projects.js";
@@ -8,6 +8,26 @@ export const pendingDescriptions = new Map<
   number,
   { projectId: number }
 >();
+
+const MONTH_NAMES_ES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+function getRecentMonths(count: number): Array<{ key: string; label: string }> {
+  const months = [];
+  const now = new Date();
+  for (let i = 0; i < count; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    months.push({
+      key: `${year}-${String(month).padStart(2, "0")}`,
+      label: `${MONTH_NAMES_ES[month - 1]} ${year}`,
+    });
+  }
+  return months;
+}
 
 export function registerCallbacks(bot: Bot) {
   bot.on("callback_query:data", async (ctx) => {
@@ -83,21 +103,36 @@ export function registerCallbacks(bot: Bot) {
         return;
       }
 
-      // === Report: select client ===
+      // === Report: select client → show month picker ===
       if (data.startsWith("report:")) {
         const clientId = Number(data.split(":")[1]);
+        await ctx.answerCallbackQuery();
+
+        const months = getRecentMonths(4);
+        const keyboard = new InlineKeyboard();
+        for (const m of months) {
+          keyboard.text(m.label, `report_month:${clientId}:${m.key}`).row();
+        }
+
+        await ctx.editMessageText("¿De qué mes querés el reporte?", {
+          reply_markup: keyboard,
+        });
+        return;
+      }
+
+      // === Report: month selected → generate PDF ===
+      if (data.startsWith("report_month:")) {
+        const [, clientIdStr, month] = data.split(":");
+        const clientId = Number(clientIdStr);
         await ctx.answerCallbackQuery({ text: "Generando reporte..." });
 
-        // Get JSON summary for caption
-        const summary = await chronos.getWeeklyReportJson(clientId);
-
-        // Get PDF
-        const pdfBuffer = await chronos.getWeeklyReportPdf(clientId);
+        const summary = await chronos.getMonthlyReportJson(clientId, month);
+        const pdfBuffer = await chronos.getMonthlyReportPdf(clientId, month);
         const uint8 = new Uint8Array(pdfBuffer);
 
         await ctx.editMessageText(summary.display);
         await ctx.replyWithDocument(
-          new InputFile(uint8, `reporte-semanal.pdf`),
+          new InputFile(uint8, `reporte-${month}.pdf`),
           { caption: summary.display },
         );
         return;

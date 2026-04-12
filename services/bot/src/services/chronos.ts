@@ -105,15 +105,16 @@ export async function getEntries(params?: {
 
 // === Reports ===
 
-export async function getWeeklyReportPdf(
+export async function getMonthlyReportPdf(
   clientId: number,
+  month: string,
 ): Promise<ArrayBuffer> {
   const res = await fetch(
-    `${BASE}/v1/reports/weekly?client_id=${clientId}&format=pdf`,
+    `${BASE}/v1/reports/monthly?client_id=${clientId}&month=${month}&format=pdf`,
   );
   return res.arrayBuffer();
 }
 
-export async function getWeeklyReportJson(clientId: number) {
-  return request(`/v1/reports/weekly?client_id=${clientId}`);
+export async function getMonthlyReportJson(clientId: number, month: string) {
+  return request(`/v1/reports/monthly?client_id=${clientId}&month=${month}`);
 }
